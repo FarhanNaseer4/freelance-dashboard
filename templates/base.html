@@ -1,0 +1,57 @@
+{% load ui_tags %}
+<!doctype html>
+<html lang="en" x-data="{ dark: localStorage.theme === 'dark' }" x-init="$watch('dark', value => localStorage.theme = value ? 'dark' : 'light')" :class="{ 'dark': dark }">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Freelance Dashboard{% endblock %}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config = { darkMode: 'class' }</script>
+  <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="bg-slate-50 text-slate-950 antialiased dark:bg-neutral-950 dark:text-slate-100">
+  <div class="min-h-screen lg:flex">
+    <aside class="border-r border-slate-200 bg-white/90 p-4 dark:border-neutral-800 dark:bg-neutral-950 lg:fixed lg:inset-y-0 lg:w-64">
+      <div class="flex items-center justify-between">
+        <a href="{% url 'dashboard:home' %}" class="text-lg font-semibold tracking-tight">Freelance OS</a>
+        <button @click="dark = !dark" class="rounded-md border border-slate-200 p-2 text-sm dark:border-neutral-700" title="Toggle theme"><i data-lucide="moon" class="h-4 w-4"></i></button>
+      </div>
+      <nav class="mt-8 grid gap-1 text-sm">
+        <a class="flex items-center gap-2 rounded-md px-3 py-2 hover:bg-slate-100 dark:hover:bg-neutral-900" href="{% url 'dashboard:home' %}"><i data-lucide="layout-dashboard" class="h-4 w-4"></i>Dashboard</a>
+        <a class="flex items-center gap-2 rounded-md px-3 py-2 hover:bg-slate-100 dark:hover:bg-neutral-900" href="{% url 'projects:list' %}"><i data-lucide="list-checks" class="h-4 w-4"></i>Projects</a>
+        <a class="flex items-center gap-2 rounded-md px-3 py-2 hover:bg-slate-100 dark:hover:bg-neutral-900" href="{% url 'projects:pipeline' %}"><i data-lucide="kanban" class="h-4 w-4"></i>Pipeline</a>
+        <a class="flex items-center gap-2 rounded-md px-3 py-2 hover:bg-slate-100 dark:hover:bg-neutral-900" href="{% url 'projects:completed' %}"><i data-lucide="archive" class="h-4 w-4"></i>Completed</a>
+        <a class="flex items-center gap-2 rounded-md px-3 py-2 hover:bg-slate-100 dark:hover:bg-neutral-900" href="{% url 'dashboard:followups' %}"><i data-lucide="bell-ring" class="h-4 w-4"></i>Follow-Ups</a>
+        <a class="flex items-center gap-2 rounded-md px-3 py-2 hover:bg-slate-100 dark:hover:bg-neutral-900" href="{% url 'clients:list' %}"><i data-lucide="users" class="h-4 w-4"></i>Clients</a>
+        <a class="flex items-center gap-2 rounded-md px-3 py-2 hover:bg-slate-100 dark:hover:bg-neutral-900" href="{% url 'clients:health' %}"><i data-lucide="heart-pulse" class="h-4 w-4"></i>Client Health</a>
+        <a class="flex items-center gap-2 rounded-md px-3 py-2 hover:bg-slate-100 dark:hover:bg-neutral-900" href="{% url 'dashboard:calendar' %}"><i data-lucide="calendar-days" class="h-4 w-4"></i>Calendar</a>
+        <a class="flex items-center gap-2 rounded-md px-3 py-2 hover:bg-slate-100 dark:hover:bg-neutral-900" href="{% url 'payments:list' %}"><i data-lucide="credit-card" class="h-4 w-4"></i>Payments</a>
+        <a class="flex items-center gap-2 rounded-md px-3 py-2 hover:bg-slate-100 dark:hover:bg-neutral-900" href="{% url 'dashboard:analytics' %}"><i data-lucide="chart-no-axes-combined" class="h-4 w-4"></i>Analytics</a>
+        <a class="flex items-center gap-2 rounded-md px-3 py-2 hover:bg-slate-100 dark:hover:bg-neutral-900" href="{% url 'imports:home' %}"><i data-lucide="import" class="h-4 w-4"></i>Imports / Exports</a>
+        <a class="flex items-center gap-2 rounded-md px-3 py-2 hover:bg-slate-100 dark:hover:bg-neutral-900" href="/admin/"><i data-lucide="settings" class="h-4 w-4"></i>Admin</a>
+      </nav>
+    </aside>
+    <main class="flex-1 lg:pl-64">
+      <header class="sticky top-0 z-10 border-b border-slate-200 bg-white/85 px-4 py-3 backdrop-blur dark:border-neutral-800 dark:bg-neutral-950/85 sm:px-6">
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p class="text-xs font-medium uppercase tracking-wide text-slate-500">{% block eyebrow %}Personal CRM{% endblock %}</p>
+            <h1 class="text-xl font-semibold tracking-tight">{% block heading %}Dashboard{% endblock %}</h1>
+          </div>
+          <form action="{% url 'projects:list' %}" method="get" class="w-full sm:max-w-xs">
+            <input name="q" class="w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-slate-400 dark:border-neutral-800 dark:bg-neutral-900" placeholder="Search projects or clients">
+          </form>
+        </div>
+      </header>
+      <section class="p-4 sm:p-6">
+        {% block content %}{% endblock %}
+      </section>
+    </main>
+  </div>
+  <script>if (window.lucide) { lucide.createIcons(); }</script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

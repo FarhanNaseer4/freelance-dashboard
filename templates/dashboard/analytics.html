@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block heading %}Revenue Analytics{% endblock %}
+{% block content %}
+<div class="grid gap-4 md:grid-cols-4">
+  <div class="rounded-lg border border-slate-200 bg-white p-4 dark:border-neutral-800 dark:bg-neutral-900"><p class="text-sm text-slate-500">Total Revenue</p><p class="text-2xl font-semibold">${{ total_revenue|floatformat:2 }}</p></div>
+  <div class="rounded-lg border border-slate-200 bg-white p-4 dark:border-neutral-800 dark:bg-neutral-900"><p class="text-sm text-slate-500">Net Revenue</p><p class="text-2xl font-semibold">${{ net_total_revenue|floatformat:2 }}</p></div>
+  <div class="rounded-lg border border-slate-200 bg-white p-4 dark:border-neutral-800 dark:bg-neutral-900"><p class="text-sm text-slate-500">Platform Fees</p><p class="text-2xl font-semibold">${{ total_platform_fees|floatformat:2 }}</p></div>
+  <div class="rounded-lg border border-slate-200 bg-white p-4 dark:border-neutral-800 dark:bg-neutral-900"><p class="text-sm text-slate-500">Contract Revenue</p><p class="text-2xl font-semibold">${{ contract_revenue|floatformat:2 }}</p></div>
+  <div class="rounded-lg border border-slate-200 bg-white p-4 dark:border-neutral-800 dark:bg-neutral-900"><p class="text-sm text-slate-500">Tips</p><p class="text-2xl font-semibold">${{ tip_revenue|floatformat:2 }}</p></div>
+  <div class="rounded-lg border border-slate-200 bg-white p-4 dark:border-neutral-800 dark:bg-neutral-900"><p class="text-sm text-slate-500">Bonus</p><p class="text-2xl font-semibold">${{ bonus_revenue|floatformat:2 }}</p></div>
+  <div class="rounded-lg border border-slate-200 bg-white p-4 dark:border-neutral-800 dark:bg-neutral-900"><p class="text-sm text-slate-500">Average Project Value</p><p class="text-2xl font-semibold">${{ average_project_value|floatformat:2 }}</p></div>
+  <div class="rounded-lg border border-slate-200 bg-white p-4 dark:border-neutral-800 dark:bg-neutral-900"><p class="text-sm text-slate-500">Best Client</p><p class="text-xl font-semibold">{{ best_client.label|default:"-" }}</p></div>
+  <div class="rounded-lg border border-slate-200 bg-white p-4 dark:border-neutral-800 dark:bg-neutral-900"><p class="text-sm text-slate-500">Top Platform</p><p class="text-xl font-semibold">{{ most_profitable_platform.label|default:"-" }}</p></div>
+  <div class="rounded-lg border border-slate-200 bg-white p-4 dark:border-neutral-800 dark:bg-neutral-900"><p class="text-sm text-slate-500">Pending / Uncleared</p><p class="text-xl font-semibold">${{ pending_contract|floatformat:2 }} / ${{ uncleared_hourly|floatformat:2 }}</p></div>
+</div>
+<div class="mt-6 grid gap-4 xl:grid-cols-2">
+  <div class="rounded-lg border border-slate-200 bg-white p-4 dark:border-neutral-800 dark:bg-neutral-900"><h2 class="mb-4 text-sm font-semibold">Revenue Split</h2><canvas id="category"></canvas></div>
+  <div class="rounded-lg border border-slate-200 bg-white p-4 dark:border-neutral-800 dark:bg-neutral-900"><h2 class="mb-4 text-sm font-semibold">Revenue by Month</h2><canvas id="month"></canvas></div>
+  <div class="rounded-lg border border-slate-200 bg-white p-4 dark:border-neutral-800 dark:bg-neutral-900"><h2 class="mb-4 text-sm font-semibold">Net Revenue by Month</h2><canvas id="netMonth"></canvas></div>
+  <div class="rounded-lg border border-slate-200 bg-white p-4 dark:border-neutral-800 dark:bg-neutral-900"><h2 class="mb-4 text-sm font-semibold">Revenue by Platform</h2><canvas id="platform"></canvas></div>
+  <div class="rounded-lg border border-slate-200 bg-white p-4 dark:border-neutral-800 dark:bg-neutral-900"><h2 class="mb-4 text-sm font-semibold">Revenue by Project Type</h2><canvas id="type"></canvas></div>
+  <div class="rounded-lg border border-slate-200 bg-white p-4 dark:border-neutral-800 dark:bg-neutral-900"><h2 class="mb-4 text-sm font-semibold">Revenue by Client</h2><canvas id="client"></canvas></div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+const colors = ['#2563eb','#16a34a','#f97316','#9333ea','#06b6d4','#ef4444','#64748b'];
+function chart(id, data, type='bar'){ new Chart(document.getElementById(id), { type, data:{ labels:data.map(x=>x.label), datasets:[{ data:data.map(x=>x.value), backgroundColor:colors, borderColor:colors, tension:.35 }] }, options:{ responsive:true, scales: type === 'doughnut' ? {} : { y:{ beginAtZero:true } } } }); }
+chart('category', {{ revenue_category_json|safe }}, 'doughnut'); chart('month', {{ revenue_month_json|safe }}, 'line'); chart('netMonth', {{ net_revenue_month_json|safe }}, 'line'); chart('platform', {{ platform_revenue_json|safe }}, 'doughnut'); chart('type', {{ project_type_json|safe }}); chart('client', {{ client_revenue_json|safe }});
+</script>
+{% endblock %}

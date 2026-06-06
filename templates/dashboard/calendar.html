@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block heading %}Calendar{% endblock %}
+{% block eyebrow %}{{ month|date:"F Y" }}{% endblock %}
+{% block content %}
+<div class="mb-4 flex flex-wrap gap-2">
+  <a class="rounded-md border border-slate-200 px-3 py-2 text-sm dark:border-neutral-800" href="?year={{ previous_month.year }}&month={{ previous_month.month }}">Previous</a>
+  <a class="rounded-md border border-slate-200 px-3 py-2 text-sm dark:border-neutral-800" href="?year={{ next_month.year }}&month={{ next_month.month }}">Next</a>
+</div>
+<div class="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
+  <div class="grid grid-cols-7 border-b border-slate-200 text-xs font-medium uppercase text-slate-500 dark:border-neutral-800">
+    <div class="p-3">Mon</div><div class="p-3">Tue</div><div class="p-3">Wed</div><div class="p-3">Thu</div><div class="p-3">Fri</div><div class="p-3">Sat</div><div class="p-3">Sun</div>
+  </div>
+  {% for week in weeks %}
+    <div class="grid min-h-32 grid-cols-7 border-b border-slate-100 last:border-b-0 dark:border-neutral-800">
+      {% for day in week %}
+        <div class="min-h-32 border-r border-slate-100 p-2 last:border-r-0 dark:border-neutral-800">
+          {% if day %}
+            <p class="mb-2 text-xs font-semibold">{{ day.date.day }}</p>
+            <div class="grid gap-1">
+              {% for event in day.events %}
+                <a href="{% url 'projects:detail' event.project.pk %}" class="rounded-md bg-slate-100 px-2 py-1 text-xs dark:bg-neutral-800">{{ event.type }} · {{ event.title }}</a>
+              {% endfor %}
+            </div>
+          {% endif %}
+        </div>
+      {% endfor %}
+    </div>
+  {% endfor %}
+</div>
+<section class="mt-6 rounded-lg border border-slate-200 bg-white dark:border-neutral-800 dark:bg-neutral-900">
+  <div class="border-b border-slate-200 p-4 dark:border-neutral-800"><h2 class="text-sm font-semibold">All Upcoming Events</h2></div>
+  <div class="divide-y divide-slate-100 dark:divide-neutral-800">
+    {% for event in events %}
+      <a href="{% url 'projects:detail' event.project.pk %}" class="grid gap-2 p-4 hover:bg-slate-50 dark:hover:bg-neutral-800 sm:grid-cols-4">
+        <span class="font-medium">{{ event.date }}</span>
+        <span class="rounded-full bg-slate-100 px-2 py-1 text-xs dark:bg-neutral-800 sm:w-fit">{{ event.type }}</span>
+        <span class="sm:col-span-2">{{ event.title }} <span class="text-slate-500">· {{ event.project.client.name }}</span></span>
+      </a>
+    {% empty %}
+      <p class="p-4 text-sm text-slate-500">No calendar events yet.</p>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,13 @@
+<div class="grid gap-2">
+  {% for project in projects %}
+    <a href="{% url 'projects:detail' project.pk %}" class="rounded-md border border-slate-100 p-3 text-sm hover:bg-slate-50 dark:border-neutral-800 dark:hover:bg-neutral-800">
+      <span class="flex items-center justify-between gap-2">
+        <span class="font-medium">{{ project.name }}</span>
+        <span class="h-2 w-2 rounded-full {% if project.priority == 'High' %}bg-red-500{% elif project.priority == 'Medium' %}bg-orange-500{% else %}bg-green-500{% endif %}"></span>
+      </span>
+      <span class="mt-1 block text-xs text-slate-500">{{ project.client.name }} · {{ project.status }}</span>
+    </a>
+  {% empty %}
+    <div class="rounded-md border border-dashed border-slate-200 p-4 text-sm text-slate-500 dark:border-neutral-800">Clear.</div>
+  {% endfor %}
+</div>

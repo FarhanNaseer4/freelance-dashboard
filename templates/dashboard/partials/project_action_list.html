@@ -1,0 +1,19 @@
+<div class="grid gap-3">
+  {% for project in projects %}
+    <div class="rounded-md border border-slate-100 p-3 dark:border-neutral-800">
+      <div class="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <a class="font-medium hover:underline" href="{% url 'projects:detail' project.pk %}">{{ project.name }}</a>
+          <p class="mt-1 text-xs text-slate-500">{{ project.client.name }} · {{ project.status }} · {{ project.next_action|default:"No next action" }}</p>
+        </div>
+        <div class="flex flex-wrap gap-1">
+          <a class="rounded-md border border-slate-200 px-2 py-1 text-xs dark:border-neutral-800" href="{% url 'projects:edit' project.pk %}">Edit</a>
+          <form method="post" action="{% url 'projects:quick_status' project.pk 'Working' %}">{% csrf_token %}<input type="hidden" name="next" value="{{ request.path }}"><button class="rounded-md border border-slate-200 px-2 py-1 text-xs dark:border-neutral-800">Working</button></form>
+          <form method="post" action="{% url 'projects:quick_status' project.pk 'Completed' %}">{% csrf_token %}<input type="hidden" name="next" value="{{ request.path }}"><button class="rounded-md border border-slate-200 px-2 py-1 text-xs dark:border-neutral-800">Complete</button></form>
+        </div>
+      </div>
+    </div>
+  {% empty %}
+    <p class="text-sm text-slate-500">Nothing here.</p>
+  {% endfor %}
+</div>

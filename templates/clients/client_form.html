@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block heading %}New Client{% endblock %}
+{% block eyebrow %}Add a client before creating their project{% endblock %}
+{% block content %}
+<form method="post" class="rounded-lg border border-slate-200 bg-white p-4 shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
+  {% csrf_token %}
+  <div class="grid gap-4 md:grid-cols-2">
+    {% for field in form %}
+      <div class="{% if field.name == 'notes' %}md:col-span-2{% endif %}">
+        <label class="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-200" for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+        {% if field.errors %}<p class="mt-1 text-sm text-red-600">{{ field.errors|join:", " }}</p>{% endif %}
+      </div>
+    {% endfor %}
+  </div>
+  <div class="mt-6 flex flex-wrap gap-2">
+    <button class="rounded-md bg-slate-950 px-4 py-2 text-sm font-medium text-white dark:bg-white dark:text-slate-950">Save Client</button>
+    <a class="rounded-md border border-slate-200 px-4 py-2 text-sm dark:border-neutral-800" href="{% url 'clients:list' %}">Cancel</a>
+  </div>
+</form>
+{% endblock %}

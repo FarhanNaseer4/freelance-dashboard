@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block heading %}{% if object %}Edit Project{% else %}New Project{% endif %}{% endblock %}
+{% block eyebrow %}{% if object %}{{ object.client.name }} · {{ object.name }}{% else %}Create a project directly from the dashboard{% endif %}{% endblock %}
+{% block content %}
+<form method="post" class="rounded-lg border border-slate-200 bg-white p-4 shadow-sm dark:border-neutral-800 dark:bg-neutral-900" x-data="{ contractType: '{{ form.contract_type.value|default:"Fixed Price" }}' }">
+  {% csrf_token %}
+  {% if form.non_field_errors %}
+    <div class="mb-4 rounded-md bg-red-50 p-3 text-sm text-red-700 dark:bg-red-500/10 dark:text-red-300">{{ form.non_field_errors }}</div>
+  {% endif %}
+  <div class="grid gap-4 md:grid-cols-2">
+    {% for field in form %}
+      <div class="{% if field.name == 'description' or field.name == 'notes' or field.name == 'tags' %}md:col-span-2{% endif %}" {% if field.name == "hourly_rate" or field.name == "expected_hours" or field.name == "billed_hours" %}x-show="contractType === 'Hourly'"{% endif %}>
+        <label class="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-200" for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {% if field.name == "contract_type" %}
+          <select name="{{ field.name }}" id="{{ field.id_for_label }}" x-model="contractType" class="w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm dark:border-neutral-800 dark:bg-neutral-950">
+            {% for value,label in field.field.choices %}<option value="{{ value }}" {% if field.value == value %}selected{% endif %}>{{ label }}</option>{% endfor %}
+          </select>
+        {% else %}
+          {{ field }}
+        {% endif %}
+        {% if field.errors %}
+          <p class="mt-1 text-sm text-red-600">{{ field.errors|join:", " }}</p>
+        {% endif %}
+      </div>
+    {% endfor %}
+  </div>
+  <div class="mt-6 flex flex-wrap gap-2">
+    <button class="rounded-md bg-slate-950 px-4 py-2 text-sm font-medium text-white dark:bg-white dark:text-slate-950">Save Changes</button>
+    {% if object %}
+      <a class="rounded-md border border-slate-200 px-4 py-2 text-sm dark:border-neutral-800" href="{% url 'projects:detail' object.pk %}">Cancel</a>
+    {% else %}
+      <a class="rounded-md border border-slate-200 px-4 py-2 text-sm dark:border-neutral-800" href="{% url 'projects:list' %}">Cancel</a>
+    {% endif %}
+  </div>
+</form>
+<div class="mt-4 rounded-lg border border-slate-200 bg-white p-4 text-sm text-slate-600 dark:border-neutral-800 dark:bg-neutral-900 dark:text-slate-300">
+  <p x-show="contractType === 'Fixed Price'">Fixed-price projects use budget, payments, tips/bonus, status, and delivery tracking.</p>
+  <p x-show="contractType === 'Hourly'">Hourly projects unlock time logs, cleared payments, cleared hours, and uncleared balance on the project detail page.</p>
+  <p x-show="contractType === 'Milestone Based'">Milestone projects unlock milestone creation, current milestone tracking, completion, and mark-paid actions after saving.</p>
+</div>
+{% endblock %}

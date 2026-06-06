@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block heading %}Imports / Exports{% endblock %}
+{% block content %}
+<div class="grid gap-4 xl:grid-cols-3">
+  <section class="rounded-lg border border-slate-200 bg-white p-4 dark:border-neutral-800 dark:bg-neutral-900 xl:col-span-2">
+    <h2 class="mb-4 text-sm font-semibold">CSV / Excel Import</h2>
+    <form method="post" enctype="multipart/form-data" class="grid gap-3">
+      {% csrf_token %}
+      {{ form.file }}
+      <label class="flex items-center gap-2 text-sm">{{ form.commit }} Save valid rows</label>
+      <button class="w-fit rounded-md bg-slate-950 px-4 py-2 text-sm font-medium text-white dark:bg-white dark:text-slate-950">Preview / Import</button>
+    </form>
+    {% if results %}
+      <div class="mt-6 overflow-x-auto"><table class="min-w-full text-sm"><thead class="text-left text-xs uppercase text-slate-500"><tr><th class="px-3 py-2">Row</th><th class="px-3 py-2">Type</th><th class="px-3 py-2">Status</th><th class="px-3 py-2">Errors</th></tr></thead><tbody>{% for result in results %}<tr><td class="px-3 py-2">{{ result.row }}</td><td class="px-3 py-2">{{ result.kind }}</td><td class="px-3 py-2">{{ result.valid|yesno:"Valid,Invalid" }}</td><td class="px-3 py-2">{{ result.errors|join:", " }}</td></tr>{% endfor %}</tbody></table></div>
+    {% endif %}
+  </section>
+  <section class="rounded-lg border border-slate-200 bg-white p-4 dark:border-neutral-800 dark:bg-neutral-900">
+    <h2 class="mb-4 text-sm font-semibold">Backup Export</h2>
+    <p class="mb-4 text-sm text-slate-500">Download a JSON backup of clients, projects, milestones, payments, time logs, notes, tags, activities, and attachment metadata.</p>
+    <a href="{% url 'imports:backup' %}" class="inline-flex rounded-md border border-slate-200 px-4 py-2 text-sm dark:border-neutral-800">Download Backup</a>
+  </section>
+</div>
+{% endblock %}

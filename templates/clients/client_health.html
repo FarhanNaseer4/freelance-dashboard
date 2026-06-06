@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block heading %}Client Health{% endblock %}
+{% block eyebrow %}Relationship overview{% endblock %}
+{% block content %}
+<div class="grid gap-4 xl:grid-cols-2">
+  <section class="rounded-lg border border-slate-200 bg-white p-4 dark:border-neutral-800 dark:bg-neutral-900">
+    <h2 class="mb-3 text-sm font-semibold">Active Clients</h2>
+    {% include "clients/partials/client_health_list.html" with clients=active_clients %}
+  </section>
+  <section class="rounded-lg border border-slate-200 bg-white p-4 dark:border-neutral-800 dark:bg-neutral-900">
+    <h2 class="mb-3 text-sm font-semibold">Needs Follow-Up</h2>
+    {% include "clients/partials/client_health_list.html" with clients=needs_followup %}
+  </section>
+  <section class="rounded-lg border border-slate-200 bg-white p-4 dark:border-neutral-800 dark:bg-neutral-900">
+    <h2 class="mb-3 text-sm font-semibold">High Value Clients</h2>
+    {% include "clients/partials/client_health_list.html" with clients=high_value_clients %}
+  </section>
+  <section class="rounded-lg border border-slate-200 bg-white p-4 dark:border-neutral-800 dark:bg-neutral-900">
+    <h2 class="mb-3 text-sm font-semibold">Inactive / Dormant</h2>
+    {% include "clients/partials/client_health_list.html" with clients=inactive_clients %}
+  </section>
+</div>
+{% endblock %}

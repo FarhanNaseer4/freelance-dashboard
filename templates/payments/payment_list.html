@@ -1,0 +1,6 @@
+{% extends "base.html" %}
+{% load ui_tags %}
+{% block heading %}Payments{% endblock %}
+{% block content %}
+<div class="overflow-x-auto rounded-lg border border-slate-200 bg-white dark:border-neutral-800 dark:bg-neutral-900"><table class="min-w-full text-sm"><thead class="text-left text-xs uppercase text-slate-500"><tr><th class="px-4 py-3">Project</th><th class="px-4 py-3">Client</th><th class="px-4 py-3">Amount</th><th class="px-4 py-3">Category</th><th class="px-4 py-3">Method</th><th class="px-4 py-3">Status</th><th class="px-4 py-3">Date</th></tr></thead><tbody class="divide-y divide-slate-100 dark:divide-neutral-800">{% for payment in payments %}<tr><td class="px-4 py-3"><a class="font-medium hover:underline" href="{% url 'projects:detail' payment.project.pk %}">{{ payment.project.name }}</a></td><td class="px-4 py-3">{{ payment.project.client.name }}</td><td class="px-4 py-3">${{ payment.amount|floatformat:2 }}</td><td class="px-4 py-3">{{ payment.category }}</td><td class="px-4 py-3">{{ payment.payment_method }}</td><td class="px-4 py-3"><span class="rounded-full px-2 py-1 text-xs {{ payment.status|status_class }}">{{ payment.status }}</span></td><td class="px-4 py-3">{{ payment.date_received|default:"Pending" }}</td></tr>{% endfor %}</tbody></table></div>
+{% endblock %}

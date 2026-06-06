@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% load ui_tags %}
+{% block heading %}Follow-Up Inbox{% endblock %}
+{% block eyebrow %}Daily action queue{% endblock %}
+{% block content %}
+<div class="grid gap-4 xl:grid-cols-2">
+  {% for title, projects in inbox_sections %}
+  {% endfor %}
+</div>
+<div class="grid gap-4 xl:grid-cols-2">
+  <section class="rounded-lg border border-slate-200 bg-white p-4 dark:border-neutral-800 dark:bg-neutral-900">
+    <h2 class="mb-3 text-sm font-semibold">Due Today</h2>
+    {% include "dashboard/partials/project_action_list.html" with projects=due_today %}
+  </section>
+  <section class="rounded-lg border border-slate-200 bg-white p-4 dark:border-neutral-800 dark:bg-neutral-900">
+    <h2 class="mb-3 text-sm font-semibold">Overdue Follow-Ups</h2>
+    {% include "dashboard/partials/project_action_list.html" with projects=overdue_followups %}
+  </section>
+  <section class="rounded-lg border border-slate-200 bg-white p-4 dark:border-neutral-800 dark:bg-neutral-900">
+    <h2 class="mb-3 text-sm font-semibold">Waiting Client</h2>
+    {% include "dashboard/partials/project_action_list.html" with projects=waiting_client %}
+  </section>
+  <section class="rounded-lg border border-slate-200 bg-white p-4 dark:border-neutral-800 dark:bg-neutral-900">
+    <h2 class="mb-3 text-sm font-semibold">Waiting Credentials</h2>
+    {% include "dashboard/partials/project_action_list.html" with projects=waiting_credentials %}
+  </section>
+  <section class="rounded-lg border border-slate-200 bg-white p-4 dark:border-neutral-800 dark:bg-neutral-900 xl:col-span-2">
+    <h2 class="mb-3 text-sm font-semibold">Due Soon</h2>
+    {% include "dashboard/partials/project_action_list.html" with projects=due_soon %}
+  </section>
+</div>
+{% endblock %}

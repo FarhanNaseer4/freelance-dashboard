@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% load ui_tags %}
+{% block title %}Dashboard · Freelance OS{% endblock %}
+{% block heading %}Command Center{% endblock %}
+{% block content %}
+<div class="mb-4 flex flex-wrap gap-2">
+  <a class="inline-flex items-center gap-2 rounded-md bg-slate-950 px-3 py-2 text-sm font-medium text-white dark:bg-white dark:text-slate-950" href="{% url 'projects:create' %}"><i data-lucide="plus" class="h-4 w-4"></i>New Project</a>
+  <a class="inline-flex items-center gap-2 rounded-md border border-slate-200 px-3 py-2 text-sm dark:border-neutral-800" href="{% url 'clients:create' %}"><i data-lucide="user-plus" class="h-4 w-4"></i>New Client</a>
+  <a class="inline-flex items-center gap-2 rounded-md border border-slate-200 px-3 py-2 text-sm dark:border-neutral-800" href="{% url 'projects:pipeline' %}"><i data-lucide="kanban" class="h-4 w-4"></i>Pipeline</a>
+</div>
+
+<div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-6">
+  <div class="rounded-lg border border-slate-200 bg-white p-3 shadow-sm dark:border-neutral-800 dark:bg-neutral-900"><p class="text-xs text-slate-500">Active</p><p class="mt-1 text-xl font-semibold">{{ metrics.active_projects }}</p></div>
+  <div class="rounded-lg border border-slate-200 bg-white p-3 shadow-sm dark:border-neutral-800 dark:bg-neutral-900"><p class="text-xs text-slate-500">Due Week</p><p class="mt-1 text-xl font-semibold">{{ metrics.due_this_week }}</p></div>
+  <div class="rounded-lg border border-slate-200 bg-white p-3 shadow-sm dark:border-neutral-800 dark:bg-neutral-900"><p class="text-xs text-slate-500">Pending</p><p class="mt-1 text-xl font-semibold">{{ metrics.pending_payments }}</p></div>
+  <div class="rounded-lg border border-slate-200 bg-white p-3 shadow-sm dark:border-neutral-800 dark:bg-neutral-900"><p class="text-xs text-slate-500">Gross Month</p><p class="mt-1 text-xl font-semibold">${{ metrics.revenue_this_month|floatformat:2 }}</p></div>
+  <div class="rounded-lg border border-slate-200 bg-white p-3 shadow-sm dark:border-neutral-800 dark:bg-neutral-900"><p class="text-xs text-slate-500">Net Month</p><p class="mt-1 text-xl font-semibold">${{ metrics.net_revenue_this_month|floatformat:2 }}</p></div>
+  <div class="rounded-lg border border-slate-200 bg-white p-3 shadow-sm dark:border-neutral-800 dark:bg-neutral-900"><p class="text-xs text-slate-500">Tips/Bonus</p><p class="mt-1 text-xl font-semibold">${{ tip_bonus|floatformat:2 }}</p></div>
+</div>
+
+<div class="mt-6 grid gap-4 xl:grid-cols-3">
+  <section class="rounded-lg border border-slate-200 bg-white p-4 shadow-sm dark:border-neutral-800 dark:bg-neutral-900 xl:col-span-2">
+    <div class="mb-4 flex items-center justify-between">
+      <h2 class="text-sm font-semibold">Work Queue</h2>
+      <a class="text-xs text-slate-500 hover:underline" href="{% url 'dashboard:followups' %}">Open inbox</a>
+    </div>
+    <div class="grid gap-3 lg:grid-cols-3">
+      <div>
+        <p class="mb-2 text-xs font-medium uppercase text-slate-500">Today</p>
+        {% include "dashboard/partials/compact_project_list.html" with projects=today_followups %}
+      </div>
+      <div>
+        <p class="mb-2 text-xs font-medium uppercase text-slate-500">Waiting Client</p>
+        {% include "dashboard/partials/compact_project_list.html" with projects=waiting_client %}
+      </div>
+      <div>
+        <p class="mb-2 text-xs font-medium uppercase text-slate-500">Due Soon</p>
+        {% include "dashboard/partials/compact_project_list.html" with projects=alerts.due_soon %}
+      </div>
+    </div>
+  </section>
+
+  <section class="rounded-lg border border-slate-200 bg-white p-4 shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
+    <h2 class="mb-4 text-sm font-semibold">Revenue</h2>
+    <canvas id="netRevenueTrend"></canvas>
+  </section>
+</div>
+
+<div class="mt-6 grid gap-4 xl:grid-cols-3">
+  <section class="rounded-lg border border-slate-200 bg-white p-4 shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
+    <h2 class="mb-4 text-sm font-semibold">Recently Completed</h2>
+    {% include "dashboard/partials/compact_project_list.html" with projects=recent_completed %}
+  </section>
+  <section class="rounded-lg border border-slate-200 bg-white p-4 shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
+    <h2 class="mb-4 text-sm font-semibold">Platform Mix</h2>
+    <canvas id="platformRevenue"></canvas>
+  </section>
+  <section class="rounded-lg border border-slate-200 bg-white p-4 shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
+    <h2 class="mb-4 text-sm font-semibold">Activity</h2>
+    <div class="grid gap-3">
+      {% for activity in recent_activity %}
+        <a href="{% url 'projects:detail' activity.project.pk %}" class="rounded-md border border-slate-100 p-3 text-sm hover:bg-slate-50 dark:border-neutral-800 dark:hover:bg-neutral-800">
+          <span class="font-medium">{{ activity.action }}</span>
+          <span class="mt-1 block text-xs text-slate-500">{{ activity.project.client.name }} · {{ activity.project.name }} · {{ activity.created_at|date:"M d" }}</span>
+        </a>
+      {% empty %}
+        <div class="rounded-md border border-dashed border-slate-200 p-4 text-sm text-slate-500 dark:border-neutral-800">No activity yet.</div>
+      {% endfor %}
+    </div>
+  </section>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+const palette = ['#2563eb','#16a34a','#f97316','#9333ea','#06b6d4','#ef4444'];
+function drawChart(id, data, type='bar') {
+  const el = document.getElementById(id);
+  if (!el) return;
+  new Chart(el, {
+    type,
+    data: { labels: data.map(x => x.label), datasets: [{ data: data.map(x => x.value), backgroundColor: palette, borderColor: palette, tension: .35 }] },
+    options: { responsive: true, plugins: { legend: { display: type !== 'line' } }, scales: type === 'line' ? { y: { beginAtZero: true } } : {} }
+  });
+}
+drawChart('netRevenueTrend', {{ net_revenue_month_json|safe }}, 'line');
+drawChart('platformRevenue', {{ platform_revenue_json|safe }}, 'doughnut');
+</script>
+{% endblock %}

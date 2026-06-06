@@ -1,0 +1,10 @@
+<div class="grid gap-3">
+  {% for client in clients %}
+    <a class="rounded-md border border-slate-100 p-3 hover:bg-slate-50 dark:border-neutral-800 dark:hover:bg-neutral-800" href="{% url 'clients:detail' client.pk %}">
+      <span class="font-medium">{{ client.name }}</span>
+      <span class="mt-1 block text-xs text-slate-500">{{ client.platform }} · ${{ client.total_revenue|floatformat:2 }} revenue · {{ client.last_contact_date|default:"No contact date" }}</span>
+    </a>
+  {% empty %}
+    <p class="text-sm text-slate-500">No clients in this group.</p>
+  {% endfor %}
+</div>
