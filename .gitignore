@@ -12,3 +12,4 @@ env/
 staticfiles/
 media/
 .vscode/
+runtime.txt

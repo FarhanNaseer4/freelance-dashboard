@@ -77,11 +77,19 @@ def database_from_url(url):
     }
 
 
-DATABASES = {
-    "default": database_from_url(
-        os.getenv("DATABASE_URL", "postgresql://postgres:postgres@localhost:5432/freelance_dashboard")
-    )
-}
+if os.getenv("USE_SQLITE", "False").lower() == "true":
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": os.getenv("SQLITE_NAME", BASE_DIR / "db.sqlite3"),
+        }
+    }
+else:
+    DATABASES = {
+        "default": database_from_url(
+            os.getenv("DATABASE_URL", "postgresql://postgres:postgres@localhost:5432/freelance_dashboard")
+        )
+    }
 
 LANGUAGE_CODE = "en-us"
 TIME_ZONE = "Asia/Karachi"
